@@ -1,0 +1,58 @@
+[*]
+[*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
+[*] Tue Aug  5 06:49:02 2025
+[*]
+[dumpfile] "/Users/qn/Code/dac/pcm56x2/tb.vcd"
+[dumpfile_mtime] "Tue Aug  5 06:48:02 2025"
+[dumpfile_size] 52635897
+[savefile] "/Users/qn/Code/dac/pcm56x2/tb.gtkw"
+[timestart] 707490000
+[size] 1309 600
+[pos] -1 -1
+*-21.000000 712087200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] tb.
+[sst_width] 193
+[signals_width] 193
+[sst_expanded] 1
+[sst_vpaned_height] 167
+@28
+tb.i2s_init.bck_o
+@420
+tb.i2s_init.E
+@28
+tb.i2s_init.lrck_i
+tb.i2s_init.data_i
+tb.i2s_init.left_start
+tb.i2s_init.right_start
+@200
+-
+@420
+tb.i2s_init.L_START
+@28
+tb.i2s_init.sdo
+tb.i2s_init.sdo1
+@200
+-
+@28
+tb.i2s_init.bck
+@22
+[color] 2
+tb.i2s_init.l_val_rr[23:0]
+[color] 2
+tb.i2s_init.r_val_rr[23:0]
+tb.i2s_init.key[23:0]
+tb.i2s_init.key2[23:0]
+tb.i2s_init.key3[23:0]
+@28
+tb.i2s_init.le
+tb.i2s_init.sdo
+tb.i2s_init.sdo2
+@29
+tb.i2s_init.sdo3
+@200
+-
+@22
+tb.i2s_init.noise_a[7:0]
+tb.i2s_init.noise_b[7:0]
+[pattern_trace] 1
+[pattern_trace] 0
