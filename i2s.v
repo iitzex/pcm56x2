@@ -58,6 +58,7 @@ reg             data_r;
 reg [3:0]       state;
 reg [6:0]       count;
 reg signed [FRAME-1:0] val, l_val, l_val_rr, r_val, r_val_rr;
+reg signed [FRAME-1:0] l_val_max, r_val_max;
 
 // 8bit TPDF dither產生器
 reg [7:0] noise, noise2;
@@ -71,6 +72,7 @@ always @(posedge bck_i or negedge rst_i) begin
     end
 end
 wire signed [8:0] dither_noise = {1'b0, noise} - {1'b0, noise2}; // TPDF, -255~+255
+// wire signed [8:0] dither_noise = 0;
 
 // 資料接收狀態機
 always @(posedge bck_i or negedge rst_i) begin
@@ -102,10 +104,14 @@ always @(posedge bck_i or negedge rst_i) begin
                     end
                 end
                 R_DONE: begin
-                    r_val    <= val;
-                    // r_val_rr <= r_val;
-                    r_val_rr <= r_val + {{15{dither_noise[8]}}, dither_noise}; // 若要加dither
-                    state    <= IDLE;
+                    r_val     <= val;
+                    r_val_max <= val + 8'h80 + {{15{dither_noise[8]}}, dither_noise}; 
+		    
+		    if (r_val_max[FRAME-1] == r_val[FRAME-1])
+		    	r_val_rr <= r_val_max;
+		    else
+		        r_val_rr <= r_val;
+                    state     <= IDLE;
                 end
                 L_TRANSFER: begin
                     if (count == E) begin
@@ -117,10 +123,14 @@ always @(posedge bck_i or negedge rst_i) begin
                     end
                 end
                 L_DONE: begin
-                    l_val    <= val;
-                    // l_val_rr <= l_val;
-                    l_val_rr <= l_val + {{15{dither_noise[8]}}, dither_noise}; // 若要加dither
-                    state    <= IDLE;
+                    l_val     <= val;
+		    l_val_max <= val + 8'h80 + {{15{dither_noise[8]}}, dither_noise};
+
+		    if (l_val_max[FRAME-1] == l_val[FRAME-1])
+		    	l_val_rr <= l_val_max;
+		    else
+		        l_val_rr <= l_val;
+                    state     <= IDLE;
                 end
             endcase
         end
@@ -147,12 +157,12 @@ reg [FRAME-1:0] key0, key1, key2, key3;
 
 always @(negedge bck_o or negedge rst_i) begin
     if (!rst_i) begin
-        key0  <= 0;
-        key1  <= 0;
-        key2  <= 0;
-        key3  <= 0;
+        key0   <= 0;
+        key1   <= 0;
+        key2   <= 0;
+        key3   <= 0;
         sdo0_o <= 0;
-        sdo1_o   <= 0;
+        sdo1_o <= 0;
         sdo2_o <= 0;
         sdo3_o <= 0;
         le0_o  <= 1;
@@ -161,22 +171,15 @@ always @(negedge bck_o or negedge rst_i) begin
         le3_o  <= 1;
         count_w <= 0;
         state_w <= IDLE;
-    end else if (left_start) begin
-        key0  <= l_val_rr + l_val_rr[7:0];
-        key2  <= l_val_rr + l_val_rr[7:0];
-        key3  <= r_val_rr + r_val_rr[7:0];
+    end else if (left_start || right_start) begin
+        key0  <= left_start ? l_val_rr : r_val_rr;
+        key2  <= l_val_rr;
+        key3  <= r_val_rr;
         le0_o <= 1;
         le2_o <= 1;
         le3_o <= 1;
         state_w <= FLASH;
-    end else if (right_start) begin
-        key0  <= r_val_rr + r_val_rr[7:0];
-        key2  <= l_val_rr + l_val_rr[7:0]; 
-        key3  <= r_val_rr + r_val_rr[7:0];
-        le0_o <= 1;
-        le2_o <= 1;
-        le3_o <= 1;
-        state_w <= FLASH;
+        count_w <= 0;
     end else if (state_w == FLASH) begin
         if (count_w == BIT) begin
             state_w <= IDLE;
