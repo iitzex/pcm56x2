@@ -105,9 +105,9 @@ always @(posedge bck_i or negedge rst_i) begin
                 end
                 R_DONE: begin
                     r_val     <= val;
-                    r_val_max <= val + 8'h80 + {{15{dither_noise[8]}}, dither_noise}; 
-		    
-		    if (r_val_max[FRAME-1] == r_val[FRAME-1])
+                    r_val_max <= val + 8'h80 + {{15{dither_noise[8]}}, dither_noise} + r_val_rr[7:0]; 
+		     
+		    if (r_val_max[FRAME-1:FRAME-2] == r_val[FRAME-1:FRAME-2])
 		    	r_val_rr <= r_val_max;
 		    else
 		        r_val_rr <= r_val;
@@ -124,9 +124,9 @@ always @(posedge bck_i or negedge rst_i) begin
                 end
                 L_DONE: begin
                     l_val     <= val;
-		    l_val_max <= val + 8'h80 + {{15{dither_noise[8]}}, dither_noise};
+		    l_val_max <= val + 8'h80 + {{15{dither_noise[8]}}, dither_noise} + l_val_rr[7:0];
 
-		    if (l_val_max[FRAME-1] == l_val[FRAME-1])
+		    if (l_val_max[FRAME-1:FRAME-2] == l_val[FRAME-1:FRAME-2])
 		    	l_val_rr <= l_val_max;
 		    else
 		        l_val_rr <= l_val;
